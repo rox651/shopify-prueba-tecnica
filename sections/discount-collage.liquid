@@ -1,19 +1,25 @@
+
 {% schema %}
 {
-  "name": "Custom featured products",
+  "name": "Collage de Descuentos",
   "tag": "section",
-  "class": "section custom-featured-products-section",
+  "class": "section discount-collage-section",
   "settings": [
     {
       "type": "text",
       "id": "heading",
-      "label": "Section title",
-      "default": "Nuestros productos destacados"
+      "label": "Título de la sección",
+      "default": "Nuestras mejores ofertas"
     },
     {
       "type": "collection",
       "id": "collection",
-      "label": "Collection"
+      "label": "Colección"
+    },
+    {
+      "type": "image_picker",
+      "id": "discount_badge",
+      "label": "Insignia de descuento"
     },
     {
       "type": "range",
@@ -27,7 +33,7 @@
   ],
   "presets": [
     {
-      "name": "Custom featured products",
+      "name": "Collage de Descuentos",
       "category": "Productos"
     }
   ]
@@ -42,12 +48,24 @@
   {% endif %}
 
   {% assign selected_collection = section.settings.collection %}
+  {% assign discounted_products = "" | split: "" %}
 
   {% if selected_collection != nil and selected_collection.products_count > 0 %}
+    {% for product in selected_collection.products %}
+      {% if product.compare_at_price > product.price %}
+        {% assign discounted_products = discounted_products | push: product %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if discounted_products.size > 0 %}
     <div class="custom-featured-products__grid">
-      {% for product in selected_collection.products limit: section.settings.products_to_show %}
+      {% for product in discounted_products limit: section.settings.products_to_show %}
         <div class="product-card">
           <a href="{{ product.url }}" class="product-card__link">
+            {% if section.settings.discount_badge != blank %}
+              <img src="{{ section.settings.discount_badge | image_url: width: 80 }}" class="product-card__badge" alt="Insignia de descuento">
+            {% endif %}
             {% if product.featured_image %}
               <img
                 src="{{ product.featured_image | image_url: width: 500 }}"
@@ -56,20 +74,16 @@
               />
             {% endif %}
             <h3 class="product-card__title">{{ product.title }}</h3>
-            <p class="product-card__price">{{ product.price | money }}</p>
+            <div class="product-card__price-wrapper">
+              <p class="product-card__price sale">{{ product.price | money }}</p>
+              <p class="product-card__price compare-at">{{ product.compare_at_price | money }}</p>
+            </div>
           </a>
         </div>
       {% endfor %}
     </div>
   {% else %}
-    {% if section.settings.collection == blank %}
-      <p class="custom-featured-products__empty">Por favor, selecciona una colección para mostrar sus productos.</p>
-    {% else %}
-      <p class="custom-featured-products__empty">
-        La colección '{{ section.settings.collection.title }}' no tiene productos. Por favor, añade productos a esta
-        colección o selecciona una diferente.
-      </p>
-    {% endif %}
+    <p class="custom-featured-products__empty">No se encontraron productos en oferta en la colección seleccionada.</p>
   {% endif %}
 </div>
 
@@ -99,11 +113,21 @@
     padding: 1rem;
     text-align: center;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
+    position: relative; 
   }
 
   .product-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  }
+
+  .product-card__badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    width: 50px; /* Tamaño ajustable */
+    height: auto;
   }
 
   .product-card__image {
@@ -121,11 +145,29 @@
     text-decoration:none;
   }
 
+  .product-card__price-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .product-card__price {
     font-size: 1.5rem;
     color: #666;
     font-weight:500;
     text-decoration:none;
+  }
+  
+  .product-card__price.sale {
+    color: #c00;
+    font-weight: 700;
+  }
+
+  .product-card__price.compare-at {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 1.2rem;
   }
 
   .custom-featured-products__empty {
@@ -133,4 +175,4 @@
     color: #999;
     font-style: italic;
   }
-</style>
+</style> 
