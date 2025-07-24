@@ -1,34 +1,34 @@
 {% schema %}
 {
-  "name": "Productos Relacionados",
+  "name": "Related Products",
   "tag": "section",
   "settings": [
     {
       "type": "text",
       "id": "heading",
-      "default": "También te podría gustar",
-      "label": "Título"
+      "default": "You might also like",
+      "label": "Heading"
     },
     {
       "type": "select",
       "id": "heading_size",
       "options": [
-        { "value": "h2", "label": "Pequeño" },
-        { "value": "h1", "label": "Mediano" },
-        { "value": "h0", "label": "Grande" }
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" }
       ],
       "default": "h1",
-      "label": "Tamaño del título"
+      "label": "Heading size"
     },
     {
       "type": "color_scheme",
       "id": "color_scheme",
-      "label": "Esquema de colores",
+      "label": "Color scheme",
       "default": "scheme-1"
     },
     {
       "type": "header",
-      "content": "Relleno de la sección"
+      "content": "Section padding"
     },
     {
       "type": "range",
@@ -37,7 +37,7 @@
       "max": 100,
       "step": 4,
       "unit": "px",
-      "label": "Relleno superior",
+      "label": "Top padding",
       "default": 36
     },
     {
@@ -47,7 +47,7 @@
       "max": 100,
       "step": 4,
       "unit": "px",
-      "label": "Relleno inferior",
+      "label": "Bottom padding",
       "default": 36
     }
   ]
@@ -263,8 +263,8 @@
   }
 
   .custom-related-product-card__title {
-    font-size: 1.1rem;
-    margin: 0 0 0.5rem 0;
+    font-size: 1.4rem;
+    margin: 0 0 0.8rem 0;
     font-weight: 600;
   }
 
@@ -276,7 +276,7 @@
   }
 
   .custom-related-product-card__price {
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
 
   .custom-related-product-card__price--sale {

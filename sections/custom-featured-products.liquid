@@ -1,14 +1,14 @@
 {% schema %}
 {
-  "name": "Custom featured products",
+  "name": "Featured Products",
   "tag": "section",
   "class": "section custom-featured-products-section",
   "settings": [
     {
       "type": "text",
       "id": "heading",
-      "label": "Section title",
-      "default": "Nuestros productos destacados"
+      "label": "Heading",
+      "default": "Our Featured Products"
     },
     {
       "type": "collection",
@@ -18,7 +18,7 @@
     {
       "type": "range",
       "id": "products_to_show",
-      "label": "Cantidad de productos a mostrar",
+      "label": "Number of products to show",
       "min": 1,
       "max": 12,
       "step": 1,
@@ -27,8 +27,8 @@
   ],
   "presets": [
     {
-      "name": "Custom featured products",
-      "category": "Productos"
+      "name": "Featured Products",
+      "category": "Products"
     }
   ]
 }
@@ -72,11 +72,11 @@
     </div>
   {% else %}
     {% if section.settings.collection == blank %}
-      <p class="custom-featured-products__empty">Por favor, selecciona una colección para mostrar sus productos.</p>
+      <p class="custom-featured-products__empty">Please select a collection to display its products.</p>
     {% else %}
       <p class="custom-featured-products__empty">
-        La colección '{{ section.settings.collection.title }}' no tiene productos. Por favor, añade productos a esta
-        colección o selecciona una diferente.
+        The collection '{{ section.settings.collection.title }}' has no products. Please add products to this collection
+        or select a different one.
       </p>
     {% endif %}
   {% endif %}

@@ -1,24 +1,24 @@
 {% schema %}
 {
-  "name": "Collage de Descuentos",
+  "name": "Discount Collage",
   "tag": "section",
   "class": "section discount-collage-section",
   "settings": [
     {
       "type": "text",
       "id": "heading",
-      "label": "Título de la sección",
-      "default": "Nuestras mejores ofertas"
+      "label": "Heading",
+      "default": "Our Best Deals"
     },
     {
       "type": "collection",
       "id": "collection",
-      "label": "Colección"
+      "label": "Collection"
     },
     {
       "type": "range",
       "id": "products_to_show",
-      "label": "Cantidad de productos a mostrar",
+      "label": "Number of products to show",
       "min": 2,
       "max": 10,
       "step": 1,
@@ -27,8 +27,8 @@
   ],
   "presets": [
     {
-      "name": "Collage de Descuentos",
-      "category": "Productos"
+      "name": "Discount Collage",
+      "category": "Products"
     }
   ]
 }
@@ -47,22 +47,13 @@
   {%- assign products_shown_count = 0 -%}
   {%- assign found_discounted_product = false -%}
 
-  <div class="custom-discount-products__grid bento-grid">
+  <div class="custom-discount-products__grid">
     {%- for product in selected_collection.products -%}
       {%- if product.compare_at_price > product.price -%}
         {%- if products_shown_count < products_to_show -%}
           {%- assign found_discounted_product = true -%}
-          {%- assign bento_item_type = products_shown_count | modulo: 5 -%}
-          <div
-            class="
-              product-card bento-item
-              {%- if bento_item_type == 0 -%}
-                bento-item--large
-              {%- elsif bento_item_type == 3 or bento_item_type == 4 -%}
-                bento-item--wide
-              {%- endif -%}
-            "
-          >
+          {%- assign bento_class = cycle 'bento-classes': 'bento-item--2x2', 'bento-item--1x1', 'bento-item--1x1', 'bento-item--2x1', 'bento-item--2x1' -%}
+          <div class="product-card bento-item {{ bento_class }}">
             <a href="{{ product.url }}" class="product-card__link">
               {%- if product.featured_image -%}
                 <img
@@ -111,16 +102,23 @@
     display: grid;
     gap: 1.5rem;
     grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 220px;
+    grid-auto-rows: 200px;
+    grid-auto-flow: dense;
   }
 
-  .custom-discount-products .bento-item--large {
+  .bento-item--2x2 {
     grid-column: span 2;
     grid-row: span 2;
   }
 
-  .custom-discount-products .bento-item--wide {
+  .bento-item--2x1 {
     grid-column: span 2;
+    grid-row: span 1;
+  }
+
+  .bento-item--1x1 {
+    grid-column: span 1;
+    grid-row: span 1;
   }
 
   .custom-discount-products .product-card {
@@ -168,23 +166,52 @@
     color: #fff;
     font-weight: 600;
   }
-  .custom-discount-products .product-card__price.sale,
-  .custom-discount-products .product-card__price.compare-at {
+  .custom-discount-products .product-card__price-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .custom-discount-products .product-card__price.sale {
+    font-size: 1.15rem;
+    font-weight: 700;
     color: #fff;
   }
 
   .custom-discount-products .product-card__price.compare-at {
+    color: #fff;
     opacity: 0.7;
+    text-decoration: line-through;
   }
 
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 1024px) {
     .custom-discount-products__grid {
       grid-template-columns: repeat(2, 1fr);
       grid-auto-rows: 250px;
     }
-    .custom-discount-products .bento-item--large,
-    .custom-discount-products .bento-item--wide {
-      grid-column: span 2;
+    .bento-item--2x2,
+    .bento-item--2x1,
+    .bento-item--1x1 {
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+    .bento-item--2x2 {
+      grid-row: span 2;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .custom-discount-products__grid {
+      grid-template-columns: 1fr;
+      grid-auto-rows: 300px;
+    }
+    .bento-item--2x2,
+    .bento-item--2x1,
+    .bento-item--1x1 {
+      grid-column: span 1;
+      grid-row: span 1;
     }
   }
 </style>
