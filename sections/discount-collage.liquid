@@ -17,18 +17,13 @@
       "label": "Colección"
     },
     {
-      "type": "image_picker",
-      "id": "discount_badge",
-      "label": "Insignia de descuento"
-    },
-    {
       "type": "range",
       "id": "products_to_show",
       "label": "Cantidad de productos a mostrar",
-      "min": 1,
-      "max": 12,
+      "min": 2,
+      "max": 10,
       "step": 1,
-      "default": 4
+      "default": 5
     }
   ],
   "presets": [
@@ -53,31 +48,34 @@
   {%- assign products_shown_count = 0 -%}
   {%- assign found_discounted_product = false -%}
 
-  <div class="custom-featured-products__grid">
+  <div class="custom-featured-products__grid bento-grid">
     {%- for product in selected_collection.products -%}
       {%- if product.compare_at_price > product.price -%}
         {%- if products_shown_count < products_to_show -%}
           {%- assign found_discounted_product = true -%}
-          <div class="product-card">
+          {%- assign bento_item_type = products_shown_count | modulo: 5 -%}
+          <div
+            class="product-card bento-item
+            {%- if bento_item_type == 0 -%}
+              bento-item--large
+            {%- elsif bento_item_type == 3 or bento_item_type == 4 -%}
+              bento-item--wide
+            {%- endif -%}"
+          >
             <a href="{{ product.url }}" class="product-card__link">
-              {%- if section.settings.discount_badge != blank -%}
-                <img
-                  src="{{ section.settings.discount_badge | image_url: width: 80 }}"
-                  class="product-card__badge"
-                  alt="Insignia de descuento"
-                >
-              {%- endif -%}
               {%- if product.featured_image -%}
                 <img
-                  src="{{ product.featured_image | image_url: width: 500 }}"
+                  src="{{ product.featured_image | image_url: width: 800 }}"
                   alt="{{ product.title | escape }}"
                   class="product-card__image"
                 />
               {%- endif -%}
-              <h3 class="product-card__title">{{ product.title }}</h3>
-              <div class="product-card__price-wrapper">
-                <p class="product-card__price sale">{{ product.price | money }}</p>
-                <p class="product-card__price compare-at">{{ product.compare_at_price | money }}</p>
+              <div class="product-card__info">
+                <h3 class="product-card__title">{{ product.title }}</h3>
+                <div class="product-card__price-wrapper">
+                  <p class="product-card__price sale">{{ product.price | money }}</p>
+                  <p class="product-card__price compare-at">{{ product.compare_at_price | money }}</p>
+                </div>
               </div>
             </a>
           </div>
@@ -109,75 +107,81 @@
   .custom-featured-products__grid {
     display: grid;
     gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 220px;
+  }
+
+  .bento-item--large {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .bento-item--wide {
+    grid-column: span 2;
   }
 
   .product-card {
     background: #fff;
     border: 1px solid #e1e1e1;
-    padding: 1rem;
-    text-align: center;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-    position: relative; 
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
   }
 
-  .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  .product-card__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
   }
 
-  .product-card__badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 10;
-    width: 50px; /* Tamaño ajustable */
-    height: auto;
+  .product-card:hover .product-card__image {
+    transform: scale(1.05);
   }
 
   .product-card__image {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 0.75rem;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    transition: transform 0.3s ease-out;
+  }
+
+  .product-card__info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+    color: #fff;
+    text-align: center;
   }
 
   .product-card__title {
-    font-size: 2rem;
-    margin: 0.5rem 0;
-    color: #333;
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem 0;
+    color: #fff;
     font-weight: 600;
-    text-decoration:none;
   }
-
-  .product-card__price-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .product-card__price {
-    font-size: 1.5rem;
-    color: #666;
-    font-weight:500;
-    text-decoration:none;
-  }
-  
-  .product-card__price.sale {
-    color: #c00;
-    font-weight: 700;
+  .product-card__price.sale,
+  .product-card__price.compare-at {
+    color: #fff;
   }
 
   .product-card__price.compare-at {
-    text-decoration: line-through;
-    color: #999;
-    font-size: 1.2rem;
+    opacity: 0.7;
   }
 
-  .custom-featured-products__empty {
-    text-align: center;
-    color: #999;
-    font-style: italic;
+  @media screen and (max-width: 768px) {
+    .custom-featured-products__grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: 250px;
+    }
+    .bento-item--large,
+    .bento-item--wide {
+      grid-column: span 2;
+    }
   }
 </style> 

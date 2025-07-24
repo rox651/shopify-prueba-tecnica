@@ -56,7 +56,14 @@
               />
             {% endif %}
             <h3 class="product-card__title">{{ product.title }}</h3>
-            <p class="product-card__price">{{ product.price | money }}</p>
+            {% if product.compare_at_price > product.price %}
+              <div class="product-card__price-wrapper">
+                <p class="product-card__price sale">{{ product.price | money }}</p>
+                <p class="product-card__price compare-at">{{ product.compare_at_price | money }}</p>
+              </div>
+            {% else %}
+              <p class="product-card__price">{{ product.price | money }}</p>
+            {% endif %}
           </a>
         </div>
       {% endfor %}
@@ -94,6 +101,7 @@
   }
 
   .product-card {
+    overflow:hidden;
     background: #fff;
     border: 1px solid #e1e1e1;
     padding: 1rem;
@@ -111,6 +119,11 @@
     height: auto;
     margin-bottom: 0.75rem;
     object-fit: cover;
+    transition: transform 0.5 ease;
+  }
+
+  .product-card:hover .product-card__image{
+    transform:rotate(-7deg);
   }
 
   .product-card__title {
@@ -126,6 +139,24 @@
     color: #666;
     font-weight:500;
     text-decoration:none;
+  }
+
+  .product-card__price-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .product-card__price.sale {
+    color: #c00;
+    font-weight: 700;
+  }
+
+  .product-card__price.compare-at {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 1.2rem;
   }
 
   .custom-featured-products__empty {
