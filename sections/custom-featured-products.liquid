@@ -43,7 +43,7 @@
 
   {% assign selected_collection = section.settings.collection %}
 
-  {% if selected_collection != nil and selected_collection.products_count > 0 %}
+  {% if selected_collection != null and selected_collection.products_count > 0 %}
     <div class="custom-featured-products__grid">
       {% for product in selected_collection.products limit: section.settings.products_to_show %}
         <div class="product-card">
@@ -53,7 +53,9 @@
                 src="{{ product.featured_image | image_url: width: 500 }}"
                 alt="{{ product.title | escape }}"
                 class="product-card__image"
-              />
+                width="500"
+                height="500"
+              >
             {% endif %}
             <h3 class="product-card__title">{{ product.title }}</h3>
             {% if product.compare_at_price > product.price %}
@@ -100,8 +102,8 @@
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   }
 
-  .product-card {
-    overflow:hidden;
+  .custom-featured-products .product-card {
+    overflow: hidden;
     background: #fff;
     border: 1px solid #e1e1e1;
     padding: 1rem;
@@ -109,12 +111,12 @@
     transition: box-shadow 0.2s ease, transform 0.2s ease;
   }
 
-  .product-card:hover {
+  .custom-featured-products .product-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   }
 
-  .product-card__image {
+  .custom-featured-products .product-card__image {
     max-width: 100%;
     height: auto;
     margin-bottom: 0.75rem;
@@ -122,38 +124,38 @@
     transition: transform 0.5 ease;
   }
 
-  .product-card:hover .product-card__image{
-    transform:rotate(-7deg);
+  .custom-featured-products .product-card:hover .product-card__image {
+    transform: rotate(-7deg);
   }
 
-  .product-card__title {
+  .custom-featured-products .product-card__title {
     font-size: 2rem;
     margin: 0.5rem 0;
     color: #333;
     font-weight: 600;
-    text-decoration:none;
+    text-decoration: none;
   }
 
-  .product-card__price {
+  .custom-featured-products .product-card__price {
     font-size: 1.5rem;
     color: #666;
-    font-weight:500;
-    text-decoration:none;
+    font-weight: 500;
+    text-decoration: none;
   }
 
-  .product-card__price-wrapper {
+  .custom-featured-products .product-card__price-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
   }
-  
-  .product-card__price.sale {
+
+  .custom-featured-products .product-card__price.sale {
     color: #c00;
     font-weight: 700;
   }
 
-  .product-card__price.compare-at {
+  .custom-featured-products .product-card__price.compare-at {
     text-decoration: line-through;
     color: #999;
     font-size: 1.2rem;
