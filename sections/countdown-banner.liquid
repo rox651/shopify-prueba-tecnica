@@ -1,0 +1,243 @@
+{% schema %}
+{
+  "name": "Banner cuenta atrás",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "Fecha de finalización",
+      "default": "2024-12-31T23:59:59",
+      "info": "Formato: AAAA-MM-DDTHH:MM:SS"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "Oferta por tiempo limitado"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto",
+      "default": "<p>¡No te pierdas nuestros increíbles descuentos!</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón",
+      "default": "Ver ofertas"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Enlace del botón"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Esquema de color",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Relleno de la sección"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno superior",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno inferior",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banner con cuenta regresiva"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="section-{{ section.id }}-padding">
+  <div class="countdown-banner color-{{ section.settings.color_scheme }} gradient">
+    <div class="page-width">
+      <div
+        class="countdown-banner__container"
+        data-section-id="{{ section.id }}"
+        data-end-date="{{ section.settings.end_date }}"
+      >
+        {%- if section.settings.heading != blank -%}
+          <h2 class="countdown-banner__heading h1">{{ section.settings.heading }}</h2>
+        {%- endif -%}
+        {%- if section.settings.text != blank -%}
+          <div class="countdown-banner__text rte">{{ section.settings.text }}</div>
+        {%- endif -%}
+
+        <div class="countdown-banner__timer" id="countdown-timer-{{ section.id }}"></div>
+
+        {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
+          <a href="{{ section.settings.button_link }}" class="button button--primary">
+            {{ section.settings.button_label }}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const countdownContainers = document.querySelectorAll('.countdown-banner__container');
+
+    const updateTimer = (timerContainer, days, hours, minutes, seconds) => {
+      timerContainer.innerHTML = '';
+
+      const timerStructure = [
+        { label: 'Días', value: days },
+        { label: 'Horas', value: hours },
+        { label: 'Minutos', value: minutes },
+        { label: 'Segundos', value: seconds },
+      ];
+
+      timerStructure.forEach((item) => {
+        const timerItemHTML = `
+          <div class="countdown-banner__timer-item">
+            <span class="countdown-banner__timer-value">${item.value.toString().padStart(2, '0')}</span>
+            <span class="countdown-banner__timer-label">${item.label}</span>
+          </div>
+        `;
+        timerContainer.insertAdjacentHTML('beforeend', timerItemHTML);
+      });
+    };
+
+    const initCountdown = (container) => {
+      const sectionId = container.dataset.sectionId;
+      const endDate = new Date(container.dataset.endDate).getTime();
+      const timerContainer = container.querySelector(`#countdown-timer-${sectionId}`);
+
+      if (!timerContainer || !endDate || isNaN(endDate)) {
+        if (timerContainer) timerContainer.innerHTML = '<p>Not valid date</p>';
+        return;
+      }
+
+      const countdownInterval = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = endDate - now;
+
+        if (distance < 0) {
+          clearInterval(countdownInterval);
+          timerContainer.innerHTML = '<p>Offer has ended</p>';
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        updateTimer(timerContainer, days, hours, minutes, seconds);
+      }, 1000);
+    };
+
+    countdownContainers.forEach(initCountdown);
+  });
+</script>
+
+<style>
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .countdown-banner {
+    padding: 4rem 2rem;
+    text-align: center;
+  }
+
+  .countdown-banner__container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .countdown-banner__heading {
+    margin-bottom: 1rem;
+  }
+
+  .countdown-banner__text {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+  }
+
+  .countdown-banner__timer {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .countdown-banner__timer-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(var(--color-background), 0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    min-width: 90px;
+  }
+
+  .countdown-banner__timer-value {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .countdown-banner__timer-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+  }
+
+  @media screen and (max-width: 768px) {
+    .countdown-banner {
+      padding: 2rem 1rem;
+    }
+
+    .countdown-banner__timer {
+      gap: 0.5rem;
+    }
+
+    .countdown-banner__timer-item {
+      padding: 0.8rem;
+      min-width: 70px;
+    }
+
+    .countdown-banner__timer-value {
+      font-size: 2rem;
+    }
+  }
+</style>

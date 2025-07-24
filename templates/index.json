@@ -9,6 +9,19 @@
  */
 {
   "sections": {
+    "countdown_banner": {
+      "type": "countdown-banner",
+      "settings": {
+        "end_date": "2024-12-31T23:59:59",
+        "heading": "Limited time offer",
+        "text": "<p>Don't miss our incredible discounts!</p>",
+        "button_label": "See offers",
+        "button_link": "shopify:\/\/collections\/all",
+        "color_scheme": "scheme-1",
+        "padding_top": 36,
+        "padding_bottom": 36
+      }
+    },
     "rich_text": {
       "type": "rich-text",
       "blocks": {
@@ -57,6 +70,7 @@
     }
   },
   "order": [
+    "countdown_banner",
     "rich_text",
     "custom-featured-products",
     "discount-collage"
