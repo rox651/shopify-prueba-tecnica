@@ -41,6 +41,15 @@
 {% endschema %}
 
 <div class="custom-featured-products">
+    {% for p in section.settings.collection.products limit: 10 %}
+      <div style="border-top: 1px solid #eee; padding: 0.5rem 0;">
+        <strong>{{ p.title }}</strong>
+        <br>Precio: {{ p.price | money_with_currency }}
+        <br>Precio de comparación: {{ p.compare_at_price | money_with_currency }}
+        <br>¿En oferta según la lógica?: {% if p.compare_at_price > p.price %}<strong>SÍ</strong>{% else %}NO{% endif %}
+      </div>
+    {% endfor %}
+
   {% if section.settings.heading != blank %}
     <h2 class="custom-featured-products__heading">
       {{ section.settings.heading }}
