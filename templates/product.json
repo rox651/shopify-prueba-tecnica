@@ -82,10 +82,13 @@
             "padding_bottom": 12
          }
       },
-      "custom-related-products": {
-         "type": "custom-related-products",
-         "settings": {}
+      "custom_related_products": {
+        "type": "custom-related-products",
+        "settings": {}
       }
    },
-   "order": ["main", "custom-related-products"]
+   "order": [
+      "main",
+      "custom_related_products"
+   ]
 }
