@@ -1,0 +1,258 @@
+{%- style -%}
+  .section-custom-related-products-js {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  .custom-related-products__heading {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .custom-related-products__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .custom-related-products-js__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+
+  .custom-related-product-card {
+    background: #fff;
+    border: 1px solid #e1e1e1;
+    text-align: center;
+  }
+  
+  .custom-related-product-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .custom-related-product-card__image-wrapper {
+    overflow: hidden;
+  }
+
+  .custom-related-product-card__image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .custom-related-product-card:hover .custom-related-product-card__image {
+    transform: scale(1.05);
+  }
+  
+  .custom-related-product-card__info {
+    padding: 1rem;
+  }
+
+  .custom-related-product-card__title {
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+  }
+
+  .custom-related-product-card__price-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .custom-related-product-card__price {
+    font-size: 1rem;
+  }
+
+  .custom-related-product-card__price--sale {
+    color: #c00;
+    font-weight: 700;
+  }
+
+  .custom-related-product-card__price--compare-at {
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+
+  @media screen and (max-width: 768px) {
+    .custom-related-products__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+{%- endstyle -%}
+
+<custom-related-products 
+  class="color-{{ section.settings.color_scheme }} gradient"
+  data-section-id="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-collection-handle="{{ product.collections.first.handle }}"
+  data-limit="4"
+  data-heading="{{ section.settings.heading | escape }}"
+  data-heading-size="{{ section.settings.heading_size }}"
+>
+  <div class="page-width section-custom-related-products-js">
+    <div class="custom-related-products-js__loading">
+      {% render 'loading-spinner' %}
+    </div>
+  </div>
+</custom-related-products>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const relatedProductsContainer = document.querySelector('custom-related-products');
+    if (!relatedProductsContainer) return;
+
+    const { productId, collectionHandle, limit, heading, headingSize } = relatedProductsContainer.dataset;
+
+    const formatMoney = (amountString) => {
+      const locale = {{ request.locale.iso_code | json }} || 'en-US';
+      const currencyCode = {{ cart.currency.iso_code | json }} || 'USD';
+      const amount = Number(amountString);
+
+      try {
+        return new Intl.NumberFormat(locale, {
+          style: 'currency',
+          currency: currencyCode,
+        }).format(amount);
+      } catch (e) {
+        return `${currencyCode} ${amount ? amount.toFixed(2) : '0.00'}`;
+      }
+    };
+
+    const resizeImage = (src, size) => {
+      if (!src || !size) return src;
+      const parts = src.split('?');
+      const url = parts[0];
+      const fileExtension = url.split('.').pop();
+      const fileName = url.replace(`.${fileExtension}`, '');
+      return `${fileName}_${size}.${fileExtension}?${parts[1] || ''}`;
+    };
+
+    const getProductCardHTML = (product) => {
+      const price = formatMoney(product.variants[0].price);
+      let compareAtPriceHTML = '';
+      if (product.variants[0].compare_at_price > product.variants[0].price) {
+        const compareAtPrice = formatMoney(product.variants[0].compare_at_price);
+        compareAtPriceHTML = `<span class="custom-related-product-card__price custom-related-product-card__price--compare-at">${compareAtPrice}</span>`;
+      }
+      
+      const imageUrl = product.images.length > 0 ? resizeImage(product.images[0].src, '500x') : '{{ "product-apparel-2.jpg" | asset_img_url: "500x" }}';
+
+      return `
+        <div class="custom-related-product-card">
+          <a href="${product.handle}">
+            <div class="custom-related-product-card__image-wrapper">
+              <img src="${imageUrl}" alt="${product.title}" class="custom-related-product-card__image" loading="lazy">
+            </div>
+            <div class="custom-related-product-card__info">
+              <h3 class="custom-related-product-card__title">${product.title}</h3>
+              <div class="custom-related-product-card__price-wrapper">
+                <span class="custom-related-product-card__price ${compareAtPriceHTML ? 'custom-related-product-card__price--sale' : ''}">${price}</span>
+                ${compareAtPriceHTML}
+              </div>
+            </div>
+          </a>
+        </div>
+      `;
+    };
+
+    const renderProducts = (products) => {
+      const productGrid = products.map(getProductCardHTML).join('');
+      const sectionHTML = `
+        <div class="page-width section-custom-related-products-js">
+          <h2 class="custom-related-products__heading ${headingSize}">${heading}</h2>
+          <div class="custom-related-products__grid">
+            ${productGrid}
+          </div>
+        </div>
+      `;
+      relatedProductsContainer.innerHTML = sectionHTML;
+    };
+
+    if (collectionHandle) {
+      const fetchUrl = `/collections/${collectionHandle}/products.json?limit=${parseInt(limit, 10) + 1}`;
+      fetch(fetchUrl)
+        .then(response => response.ok ? response.json() : Promise.reject('Failed to fetch'))
+        .then(data => {
+          const products = data.products
+            .filter(p => p.id !== parseInt(productId, 10))
+            .slice(0, parseInt(limit, 10));
+
+          if (products.length > 0) {
+            renderProducts(products);
+          } else {
+            relatedProductsContainer.style.display = 'none';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching custom related products:', error);
+          relatedProductsContainer.style.display = 'none';
+        });
+    } else {
+      relatedProductsContainer.style.display = 'none';
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Productos Relacionados (JS)",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "También te podría gustar",
+      "label": "Título"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        { "value": "h2", "label": "Pequeño" },
+        { "value": "h1", "label": "Mediano" },
+        { "value": "h0", "label": "Grande" }
+      ],
+      "default": "h1",
+      "label": "Tamaño del título"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Esquema de colores",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Relleno de la sección"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno superior",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Relleno inferior",
+      "default": 36
+    }
+  ]
+}
+{% endschema %} 
