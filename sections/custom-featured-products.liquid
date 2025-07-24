@@ -41,7 +41,7 @@
     </h2>
   {% endif %}
 
-  {% assign selected_collection = collections[section.settings.collection] %}
+  {% assign selected_collection = section.settings.collection %}
 
   {% if selected_collection != nil and selected_collection.products_count > 0 %}
     <div class="custom-featured-products__grid">
