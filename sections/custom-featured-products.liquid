@@ -45,9 +45,7 @@
 
   {% if selected_collection != nil and selected_collection.products_count > 0 %}
     <div class="custom-featured-products__grid">
-      {% assign products = selected_collection.products | slice: 0, section.settings.products_to_show %}
-      {% for product in products %}
-        <pre>{{ product | json }}</pre>
+      {% for product in selected_collection.products limit: section.settings.products_to_show %}
         <div class="product-card">
           <a href="{{ product.url }}" class="product-card__link">
             {% if product.featured_image %}
