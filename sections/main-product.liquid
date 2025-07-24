@@ -197,6 +197,19 @@
                     {{ product.description }}
                   </div>
                 {%- endif -%}
+
+              {%- when 'return_policy' -%}
+                {%- liquid
+                  assign return_policy_metafield = product.metafields.custom.politica_de_devoluciones
+                -%}
+                {%- if return_policy_metafield.value != blank -%}
+                  <div class="product__return-policy" {{ block.shopify_attributes }}>
+                    <h3 class="h4">Política de devoluciones</h3>
+                    <div class="rte">
+                      {{ return_policy_metafield.value }}
+                    </div>
+                  </div>
+                {%- endif -%}
               {%- when 'sku' -%}
                 <p
                   class="product__sku{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.sku.size == 0 %} visibility-hidden{% endif %}"
@@ -356,7 +369,10 @@
                                 </dt>
                                 <dd>
                                   <span class="price-per-item--current">
-                                    {{- 'products.product.volume_pricing.price_at_each_html' | t: price: variant_price -}}
+                                    {{-
+                                      'products.product.volume_pricing.price_at_each_html'
+                                      | t: price: variant_price
+                                    -}}
                                   </span>
                                 </dd>
                               </dl>
@@ -1674,7 +1690,7 @@
         {
           "type": "header",
           "content": "t:sections.main-product.blocks.icon_with_text.settings.pairing_2.label"
-        },        
+        },
         {
           "type": "select",
           "id": "icon_2",
@@ -1874,7 +1890,7 @@
         {
           "type": "header",
           "content": "t:sections.main-product.blocks.icon_with_text.settings.pairing_3.label"
-        },        
+        },
         {
           "type": "select",
           "id": "icon_3",
@@ -2072,6 +2088,17 @@
           "info": "t:sections.main-product.blocks.icon_with_text.settings.heading.info"
         }
       ]
+    },
+    {
+      "type": "return_policy",
+      "name": "Política de devoluciones",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Muestra la política de devoluciones desde el metacampo 'custom.politica_de_devoluciones'."
+        }
+      ]
     }
   ],
   "settings": [
@@ -2176,7 +2203,7 @@
       ],
       "default": "hide",
       "label": "t:sections.main-product.settings.mobile_thumbnails.label"
-    },    
+    },
     {
       "type": "select",
       "id": "media_position",
