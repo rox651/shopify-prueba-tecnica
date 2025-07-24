@@ -14,15 +14,6 @@
       "type": "collection",
       "id": "collection",
       "label": "Collection"
-    },
-    {
-      "type": "range",
-      "id": "products_to_show",
-      "label": "Number of products to show",
-      "min": 2,
-      "max": 10,
-      "step": 1,
-      "default": 5
     }
   ],
   "presets": [
@@ -50,10 +41,10 @@
   <div class="custom-discount-products__grid">
     {%- for product in selected_collection.products -%}
       {%- if product.compare_at_price > product.price -%}
-        {%- if products_shown_count < products_to_show -%}
+        {%- if products_shown_count < 3 -%}
+          {%- assign products_shown_count = products_shown_count | plus: 1 -%}
           {%- assign found_discounted_product = true -%}
-          {%- assign bento_class = cycle 'bento-classes': 'bento-item--2x2', 'bento-item--1x1', 'bento-item--1x1', 'bento-item--2x1', 'bento-item--2x1' -%}
-          <div class="product-card bento-item {{ bento_class }}">
+          <div class="product-card product-card--{{ products_shown_count }}">
             <a href="{{ product.url }}" class="product-card__link">
               {%- if product.featured_image -%}
                 <img
@@ -100,25 +91,26 @@
 
   .custom-discount-products__grid {
     display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
     gap: 1.5rem;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 200px;
-    grid-auto-flow: dense;
+    height: 75vh;
+    max-height: 800px;
   }
 
-  .bento-item--2x2 {
-    grid-column: span 2;
-    grid-row: span 2;
+  .product-card--1 {
+    grid-column: 1 / span 3;
+    grid-row: 1 / span 5;
   }
 
-  .bento-item--2x1 {
-    grid-column: span 2;
-    grid-row: span 1;
+  .product-card--2 {
+    grid-column: 4 / span 2;
+    grid-row: 1 / span 2;
   }
 
-  .bento-item--1x1 {
-    grid-column: span 1;
-    grid-row: span 1;
+  .product-card--3 {
+    grid-column: 4 / span 2;
+    grid-row: 3 / span 3;
   }
 
   .custom-discount-products .product-card {
@@ -186,32 +178,16 @@
     text-decoration: line-through;
   }
 
-  @media screen and (max-width: 1024px) {
-    .custom-discount-products__grid {
-      grid-template-columns: repeat(2, 1fr);
-      grid-auto-rows: 250px;
-    }
-    .bento-item--2x2,
-    .bento-item--2x1,
-    .bento-item--1x1 {
-      grid-column: span 1;
-      grid-row: span 1;
-    }
-    .bento-item--2x2 {
-      grid-row: span 2;
-    }
-  }
-
   @media screen and (max-width: 768px) {
     .custom-discount-products__grid {
-      grid-template-columns: 1fr;
-      grid-auto-rows: 300px;
+      display: flex;
+      flex-direction: column;
+      height: auto;
     }
-    .bento-item--2x2,
-    .bento-item--2x1,
-    .bento-item--1x1 {
-      grid-column: span 1;
-      grid-row: span 1;
+
+    .custom-discount-products .product-card {
+      min-height: 400px;
+      width: 100%;
     }
   }
 </style>
