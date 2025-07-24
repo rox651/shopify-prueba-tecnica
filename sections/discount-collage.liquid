@@ -14,6 +14,15 @@
       "type": "collection",
       "id": "collection",
       "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 3,
+      "step": 1,
+      "label": "Products to show",
+      "default": 3
     }
   ],
   "presets": [
@@ -34,14 +43,13 @@
 
   {% assign selected_collection = section.settings.collection %}
 
-  {%- assign products_to_show = section.settings.products_to_show -%}
   {%- assign products_shown_count = 0 -%}
   {%- assign found_discounted_product = false -%}
 
   <div class="custom-discount-products__grid">
     {%- for product in selected_collection.products -%}
       {%- if product.compare_at_price > product.price -%}
-        {%- if products_shown_count < 3 -%}
+        {%- if products_shown_count < section.settings.products_to_show -%}
           {%- assign products_shown_count = products_shown_count | plus: 1 -%}
           {%- assign found_discounted_product = true -%}
           <div class="product-card product-card--{{ products_shown_count }}">
@@ -64,7 +72,6 @@
               </div>
             </a>
           </div>
-          {%- assign products_shown_count = products_shown_count | plus: 1 -%}
         {%- endif -%}
       {%- endif -%}
     {%- endfor -%}
@@ -155,7 +162,7 @@
   .custom-discount-products .product-card__title {
     font-size: 2rem;
     margin: 0 0 0.5rem 0;
-    color: #000;
+    color: #5633ff;
     font-weight: 600;
   }
   .custom-discount-products .product-card__price-wrapper {
@@ -170,6 +177,7 @@
     font-size: 2rem;
     font-weight: 700;
     color: #fff;
+    margin: 0;
   }
 
   .custom-discount-products .product-card__price.compare-at {
