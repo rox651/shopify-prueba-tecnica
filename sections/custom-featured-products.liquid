@@ -63,7 +63,14 @@
       {% endfor %}
     </div>
   {% else %}
-    <p class="custom-featured-products__empty">Selecciona una colección válida con productos.</p>
+    {% if section.settings.collection == blank %}
+      <p class="custom-featured-products__empty">Por favor, selecciona una colección para mostrar sus productos.</p>
+    {% else %}
+      <p class="custom-featured-products__empty">
+        La colección '{{ section.settings.collection.title }}' no tiene productos. Por favor, añade productos a esta
+        colección o selecciona una diferente.
+      </p>
+    {% endif %}
   {% endif %}
 </div>
 
