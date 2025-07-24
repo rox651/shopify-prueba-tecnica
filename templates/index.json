@@ -17,17 +17,14 @@
           }
         }
       },
-      "block_order": [
-        "heading",
-        "text"
-      ],
+      "block_order": ["heading", "text"],
       "settings": {
         "color_scheme": "scheme-1",
         "full_width": true,
         "padding_top": 40,
         "padding_bottom": 0
       }
-    }
+    },
     "custom-featured-products": {
       "type": "custom-featured-products",
       "settings": {
@@ -73,11 +70,11 @@
         "padding_top": 36,
         "padding_bottom": 36
       }
-    },
+    }
   },
   "order": [
     "rich_text",
     "custom-featured-products",
-    "collage",
+    "collage"
   ]
 }
